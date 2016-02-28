@@ -12,21 +12,24 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
 
     @IBOutlet weak var tableView: UITableView!
     
-    var posts = [Post]()
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
         tableView.delegate = self
         tableView.dataSource = self
+        DataService.instance.loadPosts()
+        
+        NSNotificationCenter.defaultCenter().addObserver(self, selector: "onPostsLoaded:", name: "postLoaded", object: nil)
     }
 
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
-        return 1
+        return 1    
     }
 
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         
-        let post = posts[indexPath.row]
+        let post = DataService.instance.loadedPost[indexPath.row]
         
         if let cell = tableView.dequeueReusableCellWithIdentifier("PostCell") as? PostCell {
             
@@ -46,7 +49,11 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     }
     
     func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return posts.count
+        return DataService.instance.loadedPost.count
+    }
+    
+    func onPostsLoaded(notif: AnyObject){
+        tableView.reloadData()
     }
     
 }
